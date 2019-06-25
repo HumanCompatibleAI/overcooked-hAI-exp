@@ -1,7 +1,6 @@
 # Overcooked Human-AI Experiment Demo
 
 ## How to run psiturk app locally
-
 - Set up a virtual environment with [psiturk](https://psiturk.org/)
 (python 2.7). E.g., with anaconda, run
 ```
@@ -13,8 +12,7 @@ pip install psiturk
 - Start the server, `server on`
 - Start a debug session, `debug`.
 
-## Running on Heroku
-See [here](https://psiturk.readthedocs.io/en/latest/heroku.html)
+For additional information see the psiturk website.
 
 ## To build the experiment application (an npm app)
 Make sure that the overcooked-js package is linked as `overcooked`.
