@@ -3,7 +3,12 @@
 ## How to run psiturk app locally
 
 - Set up a virtual environment with [psiturk](https://psiturk.org/)
-(python 2.7).
+(python 2.7). E.g., with anaconda, run
+```
+conda create -n psiturk_test_env python=2.7.14
+source activate psiturk_test_env
+pip install psiturk
+```
 - Go into the main folder and run `psiturk`.
 - Start the server, `server on`
 - Start a debug session, `debug`.
