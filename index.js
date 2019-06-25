@@ -7,7 +7,7 @@ import GameServerIO from "./js/gameserver-io.js"
 import OvercookedSinglePlayerTask from "./js/overcooked-single";
 import getOvercookedPolicy from "./js/load_tf_model.js";
 
-import * as Overcooked from "overcook"
+import * as Overcooked from "overcooked"
 let OvercookedMDP = Overcooked.OvercookedMDP;
 let Direction = OvercookedMDP.Direction;
 let Action = OvercookedMDP.Action;
