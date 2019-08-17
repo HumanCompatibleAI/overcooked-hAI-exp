@@ -1,5 +1,5 @@
-import * as p from "overcooked"
-let pGame = Overcooked.OvercookedGame.OvercookedGame;
+import * as Overcooked from "overcooked"
+let OvercookedGame = Overcooked.OvercookedGame.OvercookedGame;
 let OvercookedMDP = Overcooked.OvercookedMDP;
 let Direction = OvercookedMDP.Direction;
 let Action = OvercookedMDP.Action;
