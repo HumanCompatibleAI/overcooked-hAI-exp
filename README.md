@@ -14,7 +14,7 @@ npm run build
 Make sure to change the line
 ```exports.fetch = fetch;```
 to
-```exports.fetch = window.fetch.bind(window);``` in the main js file.
+```exports.fetch = window.fetch.bind(window);``` in `static/js/task/task.js`.
 
 ## How to run psiturk app locally
 - Set up a virtual environment with [psiturk](https://psiturk.org/)
