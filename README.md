@@ -14,6 +14,8 @@ pip install psiturk
 
 For additional information see the psiturk website.
 
+An easy way to host the experiments for MTurk is by using an EC2 instance. Make sure you set it up following [these instructions](https://psiturk.readthedocs.io/en/latest/amazon_ec2.html).
+
 ## To build the experiment application (an npm app)
 Make sure that the overcooked-js package is linked as `overcooked`.
 
