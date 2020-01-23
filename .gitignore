@@ -166,6 +166,12 @@ venv.bak/
 #
 participants.db
 *.log
+psiturk-example/
+*.DS_Store
+old/
+trialdata.csv
+
+*.vscode
 
 # adobe files
 *.ai

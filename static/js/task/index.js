@@ -20,7 +20,7 @@ var randomstring = require("randomstring");
 let EXP = {
     MAIN_TRIAL_TIME: 60, //seconds
     TIMESTEP_LENGTH: 150, //milliseconds
-    DELIVERY_POINTS: 5,
+    DELIVERY_POINTS: 20,
     POINT_VALUE: .01,
     BASE_PAY: 1.00,
     PLAYER_INDEX: 1,  // Either 0 or 1
@@ -29,33 +29,36 @@ let EXP = {
 let worker_bonus = 0;
 let is_leader;
 
+
+let instructions_timeout = 15000;
+
 /***********************************
       Main trial order
  ************************************/
 
 
 let layouts = {
-    "cramped_room":[
+    "cramped_room": [
         "XXPXX",
         "O  2O",
         "X1  X",
         "XDXSX"
     ],
-    "asymmetric_advantages":[
+    "asymmetric_advantages": [
         "XXXXXXXXX",
         "O XSXOX S",
         "X   P 1 X",
         "X2  P   X",
         "XXXDXDXXX"
     ],
-    "coordination_ring":[
+    "coordination_ring": [
         "XXXPX",
         "X 1 P",
         "D2X X",
         "O   X",
         "XOSXX"
     ],
-    "random3":[
+    "random3": [
         "XXXPPXXX",
         "X      X",
         "D XXXX S",
@@ -80,8 +83,8 @@ $(document).ready(() => {
      *     utils.js
      */
     let participant_id = randomstring.generate({
-      length: 12,
-      charset: 'alphabetic'
+        length: 12,
+        charset: 'alphabetic'
     });
     // `condition` is passed by the psiturk server process
     var condition_name = Conditions.condition_names[condition];
@@ -119,7 +122,7 @@ $(document).ready(() => {
                Set up websockets server
          ***********************************/
         let HOST = "https://lit-mesa-15330.herokuapp.com/".replace(/^http/, "ws");
-        let gameserverio = new GameServerIO({HOST});
+        let gameserverio = new GameServerIO({ HOST });
 
         /************************
          Pre-task and training
@@ -132,7 +135,7 @@ $(document).ready(() => {
                     $("#pageblock").addClass("center");
                     $("#pageblock").css("width", "500px");
                     $(".instructionsnav").hide();
-                    let survey = new PageBlockSurveyHandler({containername: "pageblock"});
+                    let survey = new PageBlockSurveyHandler({ containername: "pageblock" });
                     survey.addone({
                         type: 'textdisplay',
                         questiontext: `
@@ -237,16 +240,16 @@ $(document).ready(() => {
                     });
                     setTimeout(() => {
                         $(".instructionsnav").show();
-                    }, 15000)
+                    }, instructions_timeout)
                 }
             },
 
             // Training
             {
                 'pagename': 'exp/pageblock.html',
-                'pagefunc': function() {
+                'pagefunc': function () {
                     $(".instructionsnav").hide();
-                    let npc_policy = (function() {
+                    let npc_policy = (function () {
                         let a_seq = [
                             STAY, STAY, STAY, STAY, STAY,
 
@@ -307,8 +310,8 @@ $(document).ready(() => {
                         let pause = 2;
                         return (s) => {
                             let a = STAY;
-                            if (((ai/pause) < a_seq.length) && (ai % pause === 0)) {
-                                a = a_seq[ai/pause];
+                            if (((ai / pause) < a_seq.length) && (ai % pause === 0)) {
+                                a = a_seq[ai / pause];
                             }
                             ai += 1;
                             return a
@@ -325,12 +328,12 @@ $(document).ready(() => {
 
                     let game = new OvercookedSinglePlayerTask({
                         container_id: "pageblock",
-			player_index: 0,
-                        start_grid : start_grid,
-                        npc_policies: {1: npc_policy},
-                        TIMESTEP : EXP.TIMESTEP_LENGTH,
-                        MAX_TIME : 30, //seconds
-                        init_orders: ['onion'],
+                        player_index: 0,
+                        start_grid: start_grid,
+                        npc_policies: { 1: npc_policy },
+                        TIMESTEP: EXP.TIMESTEP_LENGTH,
+                        MAX_TIME: 30, //seconds
+                        init_orders: null,
                         completion_callback: () => {
                             setTimeout(() => {
                                 $(".instructionsnav").show();
@@ -359,7 +362,7 @@ $(document).ready(() => {
                     $("#pageblock").css("width", "500px");
                     psiTurk.recordUnstructuredData('PLAYER_INDEX', EXP.PLAYER_INDEX);
                     psiTurk.recordUnstructuredData('MODEL_TYPE', EXP.MODEL_TYPE);
-                    let survey = new PageBlockSurveyHandler({containername: "pageblock"});
+                    let survey = new PageBlockSurveyHandler({ containername: "pageblock" });
                     survey.addone({
                         type: 'textdisplay',
                         questiontext: `
@@ -372,20 +375,21 @@ $(document).ready(() => {
                     });
                 }
             },
+
             {
                 'pagename': 'exp/pageblock.html',
-                'pagefunc': function() {
+                'pagefunc': function () {
                     $(".instructionsnav").hide();
-                    let npc_policy = (function() {
+                    let npc_policy = (function () {
                         return (s) => {
                             let npc_loc = s.players[1].position;
                             let npc_or = s.players[1].orientation;
-                            let npc_holding = typeof(s.players[1].held_object) !== 'undefined';
+                            let npc_holding = typeof (s.players[1].held_object) !== 'undefined';
 
                             let npc_at_pickup = _.isEqual(npc_loc, [4, 2]) && _.isEqual(npc_or, [-1, 0])
                             let npc_holding_soup = npc_holding && s.players[1].held_object.name === 'soup';
-                            let soup_on_counter = typeof(s.objects[[3, 2]]) !== 'undefined' &&
-                                s.objects[[3,2]].name === 'soup';
+                            let soup_on_counter = typeof (s.objects[[3, 2]]) !== 'undefined' &&
+                                s.objects[[3, 2]].name === 'soup';
                             let npc_at_server = _.isEqual(npc_loc, [5, 2]) && _.isEqual(npc_or, [1, 0])
 
                             let a = WEST;
@@ -411,13 +415,12 @@ $(document).ready(() => {
 
                     let game = new OvercookedSinglePlayerTask({
                         container_id: "pageblock",
-			player_index: 0,
-                        start_grid : start_grid,
-                        npc_policies: {1: npc_policy},
-                        TIMESTEP : EXP.TIMESTEP_LENGTH,
-                        MAX_TIME : 40, //seconds
-                        init_orders: ['onion'],
-                        always_serve: 'onion',
+                        player_index: 0,
+                        start_grid: start_grid,
+                        npc_policies: { 1: npc_policy },
+                        TIMESTEP: EXP.TIMESTEP_LENGTH,
+                        MAX_TIME: 40, //seconds
+                        init_orders: null,
                         completion_callback: () => {
                             // psiTurk.saveData()
                             setTimeout(() => {
@@ -443,7 +446,7 @@ $(document).ready(() => {
                 pagefunc: () => {
                     $("#pageblock").addClass("center");
                     $("#pageblock").css("width", "500px");
-                    let survey = new PageBlockSurveyHandler({containername: "pageblock"});
+                    let survey = new PageBlockSurveyHandler({ containername: "pageblock" });
                     survey.addone({
                         type: 'textdisplay',
                         questiontext: `
@@ -478,19 +481,18 @@ $(document).ready(() => {
                 'pagename': 'exp/pageblock.html',
                 'pagefunc': function () {
                     let layout_name = main_trial_order[round_num];
-		    getOvercookedPolicy(EXP.MODEL_TYPE, layout_name, AGENT_INDEX).then(function(npc_policy) {
+                    getOvercookedPolicy(EXP.MODEL_TYPE, layout_name, AGENT_INDEX).then(function (npc_policy) {
                         $(".instructionsnav").hide();
-			let npc_policies = {};
-			npc_policies[AGENT_INDEX] = npc_policy;
+                        let npc_policies = {};
+                        npc_policies[AGENT_INDEX] = npc_policy;
                         let game = new OvercookedSinglePlayerTask({
                             container_id: "pageblock",
-			    player_index: EXP.PLAYER_INDEX,
-                            start_grid : layouts[layout_name],
-			    npc_policies: npc_policies,
-                            TIMESTEP : EXP.TIMESTEP_LENGTH,
-                            MAX_TIME : EXP.MAIN_TRIAL_TIME, //seconds
-                            init_orders: ['onion'],
-                            always_serve: 'onion',
+                            player_index: EXP.PLAYER_INDEX,
+                            start_grid: layouts[layout_name],
+                            npc_policies: npc_policies,
+                            TIMESTEP: EXP.TIMESTEP_LENGTH,
+                            MAX_TIME: EXP.MAIN_TRIAL_TIME, //seconds
+                            init_orders: null,
                             completion_callback: () => {
                                 setTimeout(() => {
                                     $("#next").click()
@@ -505,7 +507,7 @@ $(document).ready(() => {
                                 psiTurk.recordTrialData(data);
                                 // console.log(data);
                                 if (data.reward > 0) {
-                                    worker_bonus += EXP.POINT_VALUE*data.reward;
+                                    worker_bonus += EXP.POINT_VALUE * data.reward;
                                 }
                             },
                             DELIVERY_REWARD: EXP.DELIVERY_POINTS
@@ -516,7 +518,7 @@ $(document).ready(() => {
                             psiTurk.recordUnstructuredData('bonus_calc', worker_bonus);
                             psiTurk.recordUnstructuredData('is_leader', is_leader);
                             psiTurk.saveData({
-                                success: () =>  {
+                                success: () => {
                                     console.log("Data sent");
                                     setTimeout(function () {
                                         instructions.finish();
@@ -539,7 +541,7 @@ $(document).ready(() => {
             {
                 pagename: 'exp/pageblock.html',
                 pagefunc: () => {
-                    let survey = new PageBlockSurveyHandler({containername: "pageblock"});
+                    let survey = new PageBlockSurveyHandler({ containername: "pageblock" });
                     survey.add([
                         {
                             type: 'textdisplay',
@@ -577,7 +579,7 @@ $(document).ready(() => {
             {
                 pagename: 'exp/pageblock.html',
                 pagefunc: () => {
-                    let survey = new PageBlockSurveyHandler({containername: "pageblock"});
+                    let survey = new PageBlockSurveyHandler({ containername: "pageblock" });
                     survey.add([
                         {
                             type: 'textdisplay',
@@ -590,12 +592,12 @@ $(document).ready(() => {
                             name: 'difficulty',
                             questiontext: 'How difficult was this task?',
                             options: [
-                                {value: '1', optiontext: 'Very Easy'},
-                                {value: '2', optiontext: 'Easy'},
-                                {value: '3', optiontext: 'Somewhat Easy'},
-                                {value: '4', optiontext: 'Somewhat Difficult'},
-                                {value: '5', optiontext: 'Difficult'},
-                                {value: '6', optiontext: 'Very Difficult'}
+                                { value: '1', optiontext: 'Very Easy' },
+                                { value: '2', optiontext: 'Easy' },
+                                { value: '3', optiontext: 'Somewhat Easy' },
+                                { value: '4', optiontext: 'Somewhat Difficult' },
+                                { value: '5', optiontext: 'Difficult' },
+                                { value: '6', optiontext: 'Very Difficult' }
                             ]
                         },
                         {
@@ -603,12 +605,12 @@ $(document).ready(() => {
                             name: 'smoothness',
                             questiontext: 'How smooth was cooperation with your partner?',
                             options: [
-                                {value: '1', optiontext: 'Very Unsmooth'},
-                                {value: '2', optiontext: 'Unsmooth'},
-                                {value: '3', optiontext: 'Somewhat Unsmooth'},
-                                {value: '4', optiontext: 'Somewhat Smooth'},
-                                {value: '5', optiontext: 'Smooth'},
-                                {value: '6', optiontext: 'Very Smooth'}
+                                { value: '1', optiontext: 'Very Unsmooth' },
+                                { value: '2', optiontext: 'Unsmooth' },
+                                { value: '3', optiontext: 'Somewhat Unsmooth' },
+                                { value: '4', optiontext: 'Somewhat Smooth' },
+                                { value: '5', optiontext: 'Smooth' },
+                                { value: '6', optiontext: 'Very Smooth' }
                             ]
                         },
                         {
@@ -616,12 +618,12 @@ $(document).ready(() => {
                             name: 'intuitiveness',
                             questiontext: 'How intuitive was this task?',
                             options: [
-                                {value: '1', optiontext: 'Very Unintuitive'},
-                                {value: '2', optiontext: 'Unintuitive'},
-                                {value: '3', optiontext: 'Somewhat Unintuitive'},
-                                {value: '4', optiontext: 'Somewhat Intuitive'},
-                                {value: '5', optiontext: 'Intuitive'},
-                                {value: '6', optiontext: 'Very Intuitive'}
+                                { value: '1', optiontext: 'Very Unintuitive' },
+                                { value: '2', optiontext: 'Unintuitive' },
+                                { value: '3', optiontext: 'Somewhat Unintuitive' },
+                                { value: '4', optiontext: 'Somewhat Intuitive' },
+                                { value: '5', optiontext: 'Intuitive' },
+                                { value: '6', optiontext: 'Very Intuitive' }
                             ]
                         },
                         {
@@ -629,17 +631,18 @@ $(document).ready(() => {
                             name: 'fun',
                             questiontext: 'How fun was this task?',
                             options: [
-                                {value: '1', optiontext: 'Very Unfun'},
-                                {value: '2', optiontext: 'Unfun'},
-                                {value: '3', optiontext: 'Somewhat Unfun'},
-                                {value: '4', optiontext: 'Somewhat Fun'},
-                                {value: '5', optiontext: 'Fun'},
-                                {value: '6', optiontext: 'Very Fun'}
+                                { value: '1', optiontext: 'Very Unfun' },
+                                { value: '2', optiontext: 'Unfun' },
+                                { value: '3', optiontext: 'Somewhat Unfun' },
+                                { value: '4', optiontext: 'Somewhat Fun' },
+                                { value: '5', optiontext: 'Fun' },
+                                { value: '6', optiontext: 'Very Fun' }
                             ]
                         },
                     ]);
                 }
             },
+
             // Demographics
             {
                 'pagename': 'exp/pageblock.html',
@@ -660,7 +663,7 @@ $(document).ready(() => {
                             required: true
                         },
                     ];
-                    let survey = new PageBlockSurveyHandler({containername: "pageblock"});
+                    let survey = new PageBlockSurveyHandler({ containername: "pageblock" });
                     survey.add(questions);
                 }
             },
@@ -694,7 +697,7 @@ $(document).ready(() => {
                     }, 30000);
                     window.save_data = () => {
                         psiTurk.saveData({
-                            success: () =>  {
+                            success: () => {
                                 clearTimeout(saving_timeout);
                                 setTimeout(function () {
                                     $("#next").click();
@@ -723,8 +726,7 @@ $(document).ready(() => {
             "exp/complete.html"
         ]
 
-        let exp_pages =
-            _.flattenDeep([pre_task_pages, task_pages, post_task_pages])
+        let exp_pages = _.flattenDeep([pre_task_pages, task_pages, post_task_pages])
         instructions = new PageBlockController(
             psiTurk, //parent
             exp_pages, //pages

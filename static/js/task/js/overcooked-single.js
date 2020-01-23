@@ -19,11 +19,10 @@ export default class OvercookedSinglePlayerTask{
             ],
         TIMESTEP = 200,
         MAX_TIME = 20, //seconds
-        init_orders=['onion'],
-        always_serve='onion',
+        init_orders = null,
         completion_callback = () => {console.log("Time up")},
         timestep_callback = (data) => {},
-        DELIVERY_REWARD = 5
+        DELIVERY_REWARD = 20
     }) {
         //NPC policies get called at every time step
         if (typeof(npc_policies) === 'undefined') {
@@ -61,9 +60,7 @@ export default class OvercookedSinglePlayerTask{
             ANIMATION_DURATION: TIMESTEP*.9,
             tileSize: 80,
             COOK_TIME: 20,
-            explosion_time: Number.MAX_SAFE_INTEGER,
             DELIVERY_REWARD: DELIVERY_REWARD,
-            always_serve: always_serve,
             player_colors: player_colors
         });
         this.init_orders = init_orders;
